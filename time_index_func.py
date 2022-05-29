@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 To import everything:
-sys.path.append(str(__projectdir__ / Path('codegen/time-index-func/')))
+sys.path.append(str(__projectdir__ / Path('submodules/time-index-func/')))
 from time_index_func import *
 
 """
@@ -466,7 +466,7 @@ def tzconvert_single(dt, oldtimezone, newtimezone):
     America/New_York
     America/Los_Angeles
     """
-    dt2 = pytz.timezone(oldtimezone).localize(dt).astimezone(pytz.timezone("UTC"))
+    dt2 = pytz.timezone(oldtimezone).localize(dt).astimezone(pytz.timezone(newtimezone))
     return(dt2)
 
 
