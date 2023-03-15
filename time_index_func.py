@@ -6,36 +6,15 @@ from time_index_func import *
 
 """
 
-relativetoprojectdir = '/../../'
-
-# preamble_macrodata:{{{
 import os
 from pathlib import Path
 import sys
 
-__projectdir__ = Path(os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + relativetoprojectdir))
+try:
+    __projectdir__ = Path(os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + relativetoprojectdir))
+except NameError:
+    __projectdir__ = Path(os.path.abspath(""))
 
-macrodatapath_readfile = __projectdir__ / Path('paths/external.txt')
-windowspath = Path("T:/cc_ra/macrodata-external/")
-clusterpath = Path("/shared/cc_ra/macrodata-external/")
-
-if os.path.isfile(macrodatapath_readfile):
-    # first try to read macrodatapath from paths/external.txt
-    with open(macrodatapath_readfile) as f:
-        macrodatapath = f.read()
-    if macrodatapath[-1] == '\n':
-        macrodatapath = macrodatapath[: -1]
-    # if relative path, give relative to this projectdir
-    if str(macrodatapath)[0: 2] == '..':
-        macrodatapath = os.path.abspath(__projectdir__ / macrodatapath)
-    macrodatapath = Path(macrodatapath)
-elif os.path.isdir(windowspath):
-    macrodatapath = windowspath
-elif os.path.isdir(clusterpath):
-    macrodatapath = clusterpath
-else:
-    print('Warning: macrodata-external folder cannot be found. Maybe need to open T:/ drive on Windows.')
-# preamble_macrodata:}}}
 
 import datetime
 from dateutil.relativedelta import relativedelta
