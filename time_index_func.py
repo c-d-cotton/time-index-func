@@ -10,11 +10,6 @@ import os
 from pathlib import Path
 import sys
 
-try:
-    __projectdir__ = Path(os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + relativetoprojectdir))
-except NameError:
-    __projectdir__ = Path(os.path.abspath(""))
-
 
 import datetime
 from dateutil.relativedelta import relativedelta
