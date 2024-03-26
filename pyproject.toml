@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "time_index_func"
+version = "0.1.0"
+description = "Time and date related utilities for data processing"
+authors = ["Christopher Cotton"]
+maintainers = ["Christopher Cotton"]
+readme = "README.md"
+homepage = "https://github.com/c-d-cotton/time-index-func"
+repository = "https://github.com/c-d-cotton/time-index-func"
+documentation = "https://github.com/c-d-cotton/time-index-func"
+keywords = ["python", "time", "utilities"]
+classifiers = [
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Utilities",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+]
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/c-d-cotton/time-index-func/issues"
+
+[tool.poetry.dependencies]
+pandas = "^2.1.4"
+pytz = "2024.1"
+python-dateutil = "2.9.0.post0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
