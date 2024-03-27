@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "time_index_func"
+name = "time_index"
 version = "0.1.0"
 description = "Time and date related utilities for data processing"
 authors = ["Christopher Cotton"]
