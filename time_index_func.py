@@ -47,6 +47,22 @@ def convertmytimetodatetime(mytime):
     return(asdatetime)
 
 
+def convertmytimetodate(mytime):
+    freq = mytime[-1]
+    if freq == 'y':
+        asdatetime = datetime.date(int(mytime[0:4]), 1, 1)
+    elif freq == 'q':
+        asdatetime = datetime.date(int(mytime[0:4]), int(mytime[4])*3, 1)
+    elif freq == 'm':
+        asdatetime = datetime.date(int(mytime[0:4]), int(mytime[4:6]), 1)
+    elif freq == 'w' or freq == 'd':
+        asdatetime = datetime.date(int(mytime[0:4]), int(mytime[4:6]), int(mytime[6: 8]))
+    else:
+        raise ValueError('Frequency not exist')
+
+    return(asdatetime)
+
+
 def convertmytimetodatetime_test():
     """
     Takes a date in the format I use and convert it to datetime.
@@ -99,108 +115,79 @@ def convertdatetimetomytime_test():
     print(convertdatetimetomytime(dt, 'S'))
 
 
-def addperiodsbyfreq(dt, freq, num):
-    """
-    Adds num periods to dt where the periods are of the length freq.
-    """
-    if freq == 'y':
-        dt = dt + relativedelta(years = num)
-    elif freq == 'q':
-        dt = dt + relativedelta(months = 3 * num)
-    elif freq == 'm':
-        dt = dt + relativedelta(months = num)
-    elif freq == 'w':
-        dt = dt + relativedelta(days = 7 * num)
-    elif freq == 'd':
-        dt = dt + relativedelta(days = num)
-    elif freq == 'H':
-        dt = dt + relativedelta(hours = num)
-    elif freq == 'M':
-        dt = dt + relativedelta(minutes = num)
-    elif freq == 'S':
-        dt = dt + relativedelta(seconds = num)
-    else:
-        raise ValueError('freq not defined. freq: ' + str(freq) + '.')
-
-    return(dt)
-
-    
-def addperiodsbyfreq_test():
-    dt = datetime.datetime(2020, 1, 2, 3, 6, 9)
-    print(addperiodsbyfreq(dt, 'y', 2))
-    print(addperiodsbyfreq(dt, 'q', 2))
-    print(addperiodsbyfreq(dt, 'm', 2))
-    print(addperiodsbyfreq(dt, 'w', 2))
-    print(addperiodsbyfreq(dt, 'd', 2))
-    print(addperiodsbyfreq(dt, 'H', 2))
-    print(addperiodsbyfreq(dt, 'M', 2))
-    print(addperiodsbyfreq(dt, 'S', 2))
-
-
-def getallpointsbetween(datetime1, datetime2, freq, asmytime = False):
-    """
-    Get all periods between two datetimes where a period is measured using freq
-    """
-    if freq == 'y':
-        dates = pd.date_range(start = datetime1, end = datetime2, freq = 'Y')
-    elif freq == 'q':
-        dates = pd.date_range(start = datetime1, end = datetime2, freq = '3M')
-    elif freq == 'm':
-        dates = pd.date_range(start = datetime1, end = datetime2, freq = 'M')
-    elif freq == 'w':
-        dates = pd.date_range(start = datetime1, end = datetime2, freq = 'W')
-    elif freq == 'd':
-        dates = pd.date_range(start = datetime1, end = datetime2, freq = 'D')
-    elif freq == 'H':
-        dates = pd.date_range(start = datetime1, end = datetime2, freq = 'H')
-    elif freq == 'M':
-        dates = pd.date_range(start = datetime1, end = datetime2, freq = 'min')
-    elif freq == 'S':
-        dates = pd.date_range(start = datetime1, end = datetime2, freq = 'S')
-    else:
-        raise ValueError('freq not defined. freq: ' + str(freq) + '.')
-
-    if asmytime is True:
-        dates = [convertdatetimetomytime(dt, freq) for dt in list(dates)]
-    else:
-        dates = dates.to_pydatetime()
-
-    return(dates)
-
-
-def getallpointsbetween_test():
-    dt1 = datetime.datetime(2020, 1, 2, 3, 6, 9)
-    print(getallpointsbetween(dt1, addperiodsbyfreq(dt1, 'y', 2), 'y') )
-    print(getallpointsbetween(dt1, addperiodsbyfreq(dt1, 'q', 2), 'q') )
-    print(getallpointsbetween(dt1, addperiodsbyfreq(dt1, 'm', 2), 'm') )
-    print(getallpointsbetween(dt1, addperiodsbyfreq(dt1, 'w', 2), 'w') )
-    print(getallpointsbetween(dt1, addperiodsbyfreq(dt1, 'd', 2), 'd') )
-    print(getallpointsbetween(dt1, addperiodsbyfreq(dt1, 'H', 2), 'H') )
-    print(getallpointsbetween(dt1, addperiodsbyfreq(dt1, 'M', 2), 'M') )
-    print(getallpointsbetween(dt1, addperiodsbyfreq(dt1, 'S', 2), 'S') )
-
-    print(getallpointsbetween(dt1, addperiodsbyfreq(dt1, 'y', 2), 'y', asmytime = True) )
-
-
-def getallpointsbetween_mytime(mytime1, mytime2, asmytime = True):
+def getallpointsbetween(mytime1, mytime2, asmytime = True):
     """
     Get all periods between two of my datetimes
     Returns as mytime unless asmytime is False
     """
-    if asmytime not in [False, True]:
-        raise ValueError('asmytime is misspecified. Should be True/False. Value: ' + str(asmytime) + '.')
     freq = mytime1[-1]
 
-    dt1 = convertmytimetodatetime(mytime1)
-    dt2 = convertmytimetodatetime(mytime2)
+    if mytime1 > mytime2:
+        raise ValueError('mytime1 should be less than mytime2.')
 
-    dates = getallpointsbetween(dt1, dt2, freq, asmytime = asmytime)
+    times = []
 
-    return(dates)
+    if freq == 'y':
+        times = list(range(int(mytime1[0: 4]), int(mytime2[0: 4]) + 1))
+        times = [str(time) + 'y' for time in times]
+    elif freq == 'q':
+        years = list(range(int(mytime1[0: 4]), int(mytime2[0: 4]) + 1))
+        for year in years:
+            for quarter in list(range(1, 5)):
+                times.append( str(year) + str(quarter) + 'q' )
+        times = [time for time in times if time >= mytime1 and time <= mytime2]
+    elif freq == 'm':
+        years = list(range(int(mytime1[0: 4]), int(mytime2[0: 4]) + 1))
+        months = []
+        for year in years:
+            for month in list(range(1, 13)):
+                times.append( str(year) + str(month).zfill(2) + 'm' )
+        times = [time for time in times if time >= mytime1 and time <= mytime2]
+    elif freq in ['d', 'H', 'M', 'S']:
+        
+        # get dates
+        dt1 = convertmytimetodate(mytime1[0: 8] + 'd')
+        dt2 = convertmytimetodate(mytime2[0: 8] + 'd')
+        delta = dt2 - dt1
+        days = []
+        for i in range(delta.days + 1):
+            days.append( convertdatetimetomytime(dt1 + datetime.timedelta(days=i), 'd') )
+
+        if freq == 'd':
+            times = days
+        elif freq == 'H':
+            for day in days:
+                for hour in list(range(0, 24)):
+                    times.append( day[0: 8] + '_' + str(hour).zfill(2) + 'H' )
+            times = [time for time in times if time >= mytime1 and time <= mytime2]
+        elif freq == 'M':
+            for day in days:
+                for hour in list(range(0, 24)):
+                    for minute in list(range(0, 60)):
+                        times.append( day[0: 8] + '_' + str(hour).zfill(2) + str(minute).zfill(2) + 'M' )
+            times = [time for time in times if time >= mytime1 and time <= mytime2]
+        elif freq == 'S':
+            for day in days:
+                for hour in list(range(0, 24)):
+                    for minute in list(range(0, 60)):
+                        for second in list(range(0, 60)):
+                            times.append( day[0: 8] + '_' + str(hour).zfill(2) + str(minute).zfill(2) + str(second).zfill(2) + 'S' )
+            times = [time for time in times if time >= mytime1 and time <= mytime2]
+        else:
+            raise ValueError('freq misspecified: ' + str(freq) + '.')
+    else:
+        raise ValueError('freq misspecified: ' + str(freq) + '.')
+
+    return(times)
 
 
-def getallpointsbetween_mytime_test():
-    print(getallpointsbetween_mytime('200101m', '200105m'))
+def getallpointsbetween_test():
+    print(getallpointsbetween('2001y', '2005y'))
+    print(getallpointsbetween('200101m', '200105m'))
+    print(getallpointsbetween('20010101d', '20010105d'))
+    print(getallpointsbetween('20010101_00H', '20010101_04H'))
+    print(getallpointsbetween('20010101_0000M', '20010101_0004M'))
+    print(getallpointsbetween('20010101_000000S', '20010101_000004S'))
 
 
 # Weekdays:{{{1
@@ -262,7 +249,7 @@ def filltime(df):
     startdate = df.index[0]
     enddate = df.index[-1]
 
-    dates = getallpointsbetween_mytime(startdate, enddate)
+    dates = getallpointsbetween(startdate, enddate)
 
     df = df.reindex(dates)
 
@@ -275,63 +262,81 @@ def filltime_test():
 
 
 # Adjusting Frequencies of Data:{{{1
-def raisefreq(df, newfreq, how = 'sameallperiod'):
+def raisefreq(df, newfreq, howfill = 'sameval'):
     """
-    Currently only works for 'y', 'q', 'm' data
+    Works for:
+    - y -> q/m
+    - q -> m
 
-    how == 'sameallperiod' means that if I have 2010Q1 = 100 then 2010M1 = 2010M2 = 2010M3 = 100 regardless of what was happening with the trend
-    Need to add an interpolation method
+    howfill options:
+    - 'sameval' (default): select every value at higher frequency to be the same as in the period for the lower frequency so 201001m/201002m/201003m take the same value as 20101q
+    - 'none': Only fill in last value in the higher frequency period i.e. 201003m for 20101q
+    - 'interpolate': interpolate the values so 201001m/201002m take values in between 20094q and 20101q
+
     """
+    df = df.copy()
+
     firstdate = df.index[0]
     lastdate = df.index[-1]
 
     oldfreq = firstdate[-1]
 
-    if oldfreq not in listoffreqs:
+    if oldfreq not in ['y', 'q']:
         raise ValueError('oldfreq not a frequency I use. oldfreq: ' + oldfreq + '.')
-    if newfreq not in listoffreqs:
+    if newfreq not in ['q', 'm']:
         raise ValueError('newfreq not a frequency I use. newfreq: ' + newfreq + '.')
 
     # verify newfreq is a higher frequency than oldfreq
     if listoffreqs.index(newfreq) <= listoffreqs.index(oldfreq):
         raise ValueError('newfreq does not have a higher frequency than oldfreq. newfreq: ' + newfreq + '. oldfreq: ' + oldfreq + '.')
 
-    datetime1 = convertmytimetodatetime(firstdate)
-    datetime2 = convertmytimetodatetime(lastdate)
+    if oldfreq == 'y':
+        if newfreq == 'q':
+            df.index = df.index.str.slice(0,4) + '4q'
+        elif newfreq == 'm':
+            df.index = df.index.str.slice(0,4) + '4q'
+        else:
+            raise ValueError('new freq not defined: ' + str(newfreq) + '.')
+    elif oldfreq == 'q':
+        if newfreq == 'm':
+            df.index = df.index.str.slice(0,4) + (df.index.str.slice(4, 5).astype(int)*3).astype(str).str.zfill(2) + 'm'
+        else:
+            raise ValueError('new freq not defined: ' + str(newfreq) + '.')
+    
+    if len(df.dropna(how = 'any')) != len(df) and howfill == 'interpolate':
+        print('There are missing values in the lower frequency data that will be filled in with interpolate.')
 
-    # ensure covering all periods by subtracting one (oldfreq) period from datetime1 and adding one (oldfreq) period to datetime2
-    datetime1 = addperiodsbyfreq(datetime1, oldfreq, -1)
-    datetime2 = addperiodsbyfreq(datetime2, oldfreq, 1)
+    # fill gaps
+    df = filltime(df)
 
-    # get datetime range with newfreq
-    newindex_dt = getallpointsbetween(datetime1, datetime2, newfreq)
-    newindex = [convertdatetimetomytime(dt, newfreq) for dt in newindex_dt]
-    newindex_asold = [convertdatetimetomytime(dt, oldfreq) for dt in newindex_dt]
+    # add interpolation
+    if howfill == 'none' or howfill is None:
+        None
+    elif howfill == 'sameval':
+        # limit how far backfill to avoid filling in missing values
+        if oldfreq == 'y' and newfreq == 'q':
+            bfillnum = 3
+        elif oldfreq == 'y' and newfreq == 'm':
+            bfillnum = 11
+        elif oldfreq == 'q' and newfreq == 'm':
+            bfillnum = 2
+        df = df.bfill(limit = bfillnum)
+    elif howfill == 'interpolate':
+        df = df.interpolate(limit_area = 'inside')
+    else:
+        raise ValueError('howfill misspecified')
 
-    if how == 'sameallperiod':
-        # create dict from oldindex to relevant values
-        oldvalueslist = df.values.tolist()
-        oldindexlist = list(df.index)
-        olddict = {}
-        for i in range(len(oldindexlist)):
-            olddict[oldindexlist[i]] = oldvalueslist[i]
-
-        numcol = len(df.columns)
-        newvalueslist = []
-        for oldind in newindex_asold:
-            if oldind in olddict:
-                newvalueslist.append(olddict[oldind])
-            else:
-                newvalueslist.append([np.nan] * numcol)
-
-        df2 = pd.DataFrame(newvalueslist, columns = df.columns, index = newindex)
-
-    return(df2)
+    return(df)
 
 
 def raisefreq_test():
     df = pd.DataFrame([[1], [2], [3]], columns = ['var1'], index = ['20101q', '20102q', '20103q'])
+    print(raisefreq(df, 'm'))
+    print(raisefreq(df, 'm', howfill = 'none'))
+    print(raisefreq(df, 'm', howfill = 'interpolate'))
 
+    # ensure not filling missing values
+    df = pd.DataFrame([[1], [np.nan], [3]], columns = ['var1'], index = ['20101q', '20102q', '20103q'])
     print(raisefreq(df, 'm'))
 
 # Strip NA Start/End:{{{1
@@ -342,6 +347,8 @@ def stripnarows_startend(df, start = True, end = True):
 
     To turn of start: start = False
     To turn of end: end = False
+
+    PROBABLY A BETTER WAY!
     """
     if start is not True and end is not True:
         raise ValueError('At least one of start and end must be specified to be True')
