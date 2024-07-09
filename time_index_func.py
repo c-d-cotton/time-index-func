@@ -190,6 +190,46 @@ def getallpointsbetween_test():
     print(getallpointsbetween('20010101_000000S', '20010101_000004S'))
 
 
+def addtimepoints(mytime, pointstoadd):
+    freq = mytime[-1]
+    if freq == 'y':
+        num = int(mytime[0: 4]) + pointstoadd
+        return(str(num) + 'y')
+    elif freq == 'q':
+        num = int(mytime[0: 4]) * 4 + int(mytime[4]) - 1 + pointstoadd
+        return(str(num // 4) + str(num % 4 + 1) + 'q')
+    elif freq == 'm':
+        num = int(mytime[0: 4]) * 12 + int(mytime[4: 6]) - 1 + pointstoadd
+        return(str(num // 12) + str(num % 12 + 1).zfill(2) + 'q')
+    elif freq == 'd':
+        thisdate = convertdatetimetomytime(convertmytimetodatetime(mytime) + datetime.timedelta(days = pointstoadd), 'd')
+        return(thisdate)
+    elif freq == 'H':
+        thisdatetime = convertdatetimetomytime(convertmytimetodatetime(mytime) + datetime.timedelta(seconds = pointstoadd * 60 * 60), 'H')
+        return(thisdatetime)
+    elif freq == 'M':
+        thisdatetime = convertdatetimetomytime(convertmytimetodatetime(mytime) + datetime.timedelta(seconds = pointstoadd * 60), 'M')
+        return(thisdatetime)
+    elif freq == 'S':
+        thisdatetime = convertdatetimetomytime(convertmytimetodatetime(mytime) + datetime.timedelta(seconds = pointstoadd), 'S')
+        return(thisdatetime)
+    else:
+        raise ValueError('Freq not defined: ' + freq + '.')
+
+
+def addtimepoints_test():
+    """
+    Add one point to first of 2010
+    """
+    print(addtimepoints("2010y", 1))
+    print(addtimepoints("20101q", 1))
+    print(addtimepoints("201001m", 1))
+    print(addtimepoints("20100101d", 1))
+    print(addtimepoints("20100101_00H", 1))
+    print(addtimepoints("20100101_0000M", 1))
+    print(addtimepoints("20100101_000000S", 1))
+
+
 # Weekdays:{{{1
 def getdayofweek(index_mytime):
     """
