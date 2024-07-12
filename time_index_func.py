@@ -115,7 +115,7 @@ def convertdatetimetomytime_test():
     print(convertdatetimetomytime(dt, 'S'))
 
 
-def getallpointsbetween(mytime1, mytime2, asmytime = True):
+def getallpointsbetween(mytime1, mytime2):
     """
     Get all periods between two of my datetimes
     Returns as mytime unless asmytime is False
@@ -190,7 +190,11 @@ def getallpointsbetween_test():
     print(getallpointsbetween('20010101_000000S', '20010101_000004S'))
 
 
-def addtimepoints(mytime, pointstoadd):
+def countperiods(mytime1, mytime2):
+    between = getallpointsbetween(mytime1, mytime2)
+    return(len(between) - 1)
+
+def addperiods(mytime, pointstoadd):
     freq = mytime[-1]
     if freq == 'y':
         num = int(mytime[0: 4]) + pointstoadd
@@ -217,17 +221,17 @@ def addtimepoints(mytime, pointstoadd):
         raise ValueError('Freq not defined: ' + freq + '.')
 
 
-def addtimepoints_test():
+def addperiods_test():
     """
     Add one point to first of 2010
     """
-    print(addtimepoints("2010y", 1))
-    print(addtimepoints("20101q", 1))
-    print(addtimepoints("201001m", 1))
-    print(addtimepoints("20100101d", 1))
-    print(addtimepoints("20100101_00H", 1))
-    print(addtimepoints("20100101_0000M", 1))
-    print(addtimepoints("20100101_000000S", 1))
+    print(addperiods("2010y", 1))
+    print(addperiods("20101q", 1))
+    print(addperiods("201001m", 1))
+    print(addperiods("20100101d", 1))
+    print(addperiods("20100101_00H", 1))
+    print(addperiods("20100101_0000M", 1))
+    print(addperiods("20100101_000000S", 1))
 
 
 # Weekdays:{{{1
