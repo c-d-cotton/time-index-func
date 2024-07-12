@@ -204,7 +204,7 @@ def addperiods(mytime, pointstoadd):
         return(str(num // 4) + str(num % 4 + 1) + 'q')
     elif freq == 'm':
         num = int(mytime[0: 4]) * 12 + int(mytime[4: 6]) - 1 + pointstoadd
-        return(str(num // 12) + str(num % 12 + 1).zfill(2) + 'q')
+        return(str(num // 12) + str(num % 12 + 1).zfill(2) + 'm')
     elif freq == 'd':
         thisdate = convertdatetimetomytime(convertmytimetodatetime(mytime) + datetime.timedelta(days = pointstoadd), 'd')
         return(thisdate)
