@@ -190,7 +190,13 @@ def getallpointsbetween_test():
     print(getallpointsbetween('20010101_000000S', '20010101_000004S'))
 
 
-def countperiods(mytime1, mytime2):
+def countperiods(mytime1, mytime2, checkiflt = False):
+    if checkiflt is False:
+        if mytime1 > mytime2:
+            mytime1temp = mytime2
+            mytime2temp = mytime1
+            mytime1 = mytime1temp
+            mytime2 = mytime2temp
     between = getallpointsbetween(mytime1, mytime2)
     return(len(between) - 1)
 
